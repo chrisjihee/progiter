@@ -535,7 +535,7 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
         self._iter_idx = self.initial
 
         # Track the last time we displayed a message
-        self._display_measurement = Measurement(-1, -1)
+        self._display_measurement = Measurement(self.initial, 0)
 
         # Track the most recent iteration/time a measurement was made
         self._curr_measurement = Measurement(self.initial, 0)
