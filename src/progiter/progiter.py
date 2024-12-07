@@ -798,7 +798,7 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
 
             >>> self = ProgIter(total=0, show_times=True)
             >>> print(self._build_message_template()[1].strip())
-            {desc} {percent:03.2f}% {iter_idx:1d}/0...{extra} rate={rate:{rate_format}} Hz, total={total}
+            {desc} {percent:5.1f}% {iter_idx:1d}/0...{extra} rate={rate:{rate_format}} Hz, total={total}
         """
         from math import log10, floor
         length_unknown = self.total is None or self.total < 0
@@ -813,7 +813,7 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
         if self.chunksize and not length_unknown:
             msg_body = [
                 ('{desc}'),
-                (' {percent:03.2f}% of ' + str(self.chunksize) + 'x'),
+                (' {percent:5.1f}% of ' + str(self.chunksize) + 'x'),
                 ('?' if length_unknown else str(self.total)),
                 ('...'),
             ]
@@ -821,7 +821,7 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
             if self.show_percent and not length_unknown:
                 msg_body = [
                     ('{desc}'),
-                    (' {percent:03.2f}% {iter_idx:' + str(n_chrs) + 'd}/'),
+                    (' {percent:5.1f}% {iter_idx:' + str(n_chrs) + 'd}/'),
                     ('?' if length_unknown else str(self.total)),
                     ('...'),
                 ]
