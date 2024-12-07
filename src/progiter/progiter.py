@@ -589,7 +589,7 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
         self.finished = False
 
         self._tryflush()
-        self.display_message()
+        #self.display_message()
 
         # The start message isn't very helpful.
         # If we enable this we could force the first iteration.
