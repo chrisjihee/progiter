@@ -92,6 +92,8 @@ Measurement = collections.namedtuple('Measurement', ['idx', 'time'])
 CLEAR_BEFORE = '\r'
 AT_END = '\n'
 
+FULL_BLOCK = "█"
+END_BLOCK_ELEMENTS = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉"]
 
 def _infer_length(iterable):
     """
@@ -366,8 +368,8 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
     """
     def __init__(self, iterable=None, desc=None, total=None, freq=1,
                  initial=0, eta_window=64, clearline=True, adjust=True,
-                 time_thresh=2.0, show_percent=True, show_times=True,
-                 show_rate=True, show_eta=True, show_total=True,
+                 time_thresh=2.0, show_percent=True, show_bar=True, bar_width=20,
+                 show_times=True, show_rate=True, show_eta=True, show_total=True,
                  show_wall=False, enabled=True, verbose=None, stream=None,
                  chunksize=None, rel_adjust_limit=4.0, homogeneous='auto',
                  timer=None, **kwargs):
@@ -425,11 +427,13 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
         self.enabled = enabled
         self.adjust = adjust
         self.show_percent = show_percent
+        self.show_bar = show_bar
         self.show_times = show_times
         self.show_rate = show_rate
         self.show_eta = show_eta
         self.show_total = show_total
         self.show_wall = show_wall
+        self.bar_width = bar_width
         self.eta_window = eta_window
         self.time_thresh = time_thresh
         self.clearline = clearline
@@ -815,25 +819,25 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
                 ('{desc}'),
                 (' {percent:5.1f}% of ' + str(self.chunksize) + 'x'),
                 ('?' if length_unknown else str(self.total)),
-                ('...'),
+                (' '),
             ]
         else:
             if self.show_percent and not length_unknown:
                 msg_body = [
                     ('{desc}'),
-                    (' {percent:5.1f}% {iter_idx:' + str(n_chrs) + 'd}/'),
+                    (' {percent:5.1f}%'),
+                    ('{bar}'),
+                    (' {iter_idx:' + str(n_chrs) + 'd}/'),
                     ('?' if length_unknown else str(self.total)),
-                    ('...'),
+                    (' '),
                 ]
             else:
                 msg_body = [
                     ('{desc}'),
                     (' {iter_idx:' + str(n_chrs) + 'd}/'),
                     ('?' if length_unknown else str(self.total)),
-                    ('...'),
+                    (' '),
                 ]
-
-        msg_body.append('{extra} ')
 
         if self.show_times:
             msg_body.append('[')
@@ -859,6 +863,19 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
         else:
             parts = ('', ''.join(msg_body), AT_END)
         return parts
+
+    def _make_bar_body(self, pos: float):
+        pos = max(0.0, min(1.0, pos))
+        body_complete_eights = int(self.bar_width * 8 * pos)
+        body_bar_count = body_complete_eights // 8
+        body_eights_count = body_complete_eights % 8
+
+        body = FULL_BLOCK * body_bar_count
+        if body_eights_count:
+            body += END_BLOCK_ELEMENTS[body_eights_count]
+        body += " " * (self.bar_width - len(body))
+
+        return f"|{body}|"
 
     def format_message(self):
         """
@@ -929,12 +946,14 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
         if self.chunksize and self.total:
             fmtkw.update({
                 'percent': self._curr_measurement.idx / self.total * 100,
+                'bar': self._make_bar_body(self._curr_measurement.idx / self.total),
                 'rate': self._iters_per_second * self.chunksize,
                 'rate_format': '4.1f' if self._iters_per_second * self.chunksize > .001 else 'g',
             })
         else:
             fmtkw.update({
                 'percent': self._curr_measurement.idx / self.total * 100 if self.total is not None and self.total > 0 else 0,
+                'bar': self._make_bar_body(self._curr_measurement.idx / self.total) if self.total is not None and self.total > 0 else '',
                 'rate': self._iters_per_second,
                 'rate_format': '4.1f' if self._iters_per_second > .001 else 'g',
             })
