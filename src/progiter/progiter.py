@@ -836,17 +836,23 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
         msg_body.append('{extra} ')
 
         if self.show_times:
-            if self.show_rate:
-                msg_body.append('rate={rate:{rate_format}} Hz,')
-
-            if self.show_eta:
-                msg_body.append(' eta={eta},' if self.total else '')
+            msg_body.append('[')
 
             if self.show_total:
-                msg_body.append(' total={total}')  # this is total time
+                msg_body.append('{total}')  # this is total time
+
+            if self.show_eta:
+                msg_body.append('<{eta}' if self.total else '')
+
+            if self.show_rate:
+                msg_body.append(', {rate:{rate_format}}Hz')
 
             if self.show_wall:
-                msg_body.append(', wall={wall}')
+                msg_body.append(', {wall}')
+
+            msg_body.append(']')
+
+        msg_body.append(' {extra}')
 
         if self.clearline:
             parts = (CLEAR_BEFORE, ''.join(msg_body), '')
