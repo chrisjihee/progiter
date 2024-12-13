@@ -948,14 +948,14 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
                 'percent': self._curr_measurement.idx / self.total * 100,
                 'bar': self._make_bar_body(self._curr_measurement.idx / self.total),
                 'rate': self._iters_per_second * self.chunksize,
-                'rate_format': '.1f' if self._iters_per_second * self.chunksize > .001 else 'g',
+                'rate_format': '.2f' if self._iters_per_second * self.chunksize > .001 else 'g',
             })
         else:
             fmtkw.update({
                 'percent': self._curr_measurement.idx / self.total * 100 if self.total is not None and self.total > 0 else 0,
                 'bar': self._make_bar_body(self._curr_measurement.idx / self.total) if self.total is not None and self.total > 0 else '',
                 'rate': self._iters_per_second,
-                'rate_format': '.1f' if self._iters_per_second > .001 else 'g',
+                'rate_format': '.2f' if self._iters_per_second > .001 else 'g',
             })
         msg = fmtstr.format(**fmtkw)
 
