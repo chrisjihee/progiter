@@ -173,7 +173,7 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
     def end(self) -> None:
         ...
 
-    def step(self, inc: int = 1, force: bool = False) -> None:
+    def step(self, inc: int = 1, force: bool = False, display: bool = True) -> None:
         ...
 
     def format_message(self):

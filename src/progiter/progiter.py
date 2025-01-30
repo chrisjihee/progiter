@@ -691,7 +691,7 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
         if force or (self._display_timedelta >= self.time_thresh):
             self.display_message()
 
-    def step(self, inc=1, force=False):
+    def step(self, inc=1, force=False, display=True):
         """
         Manually step progress update, either directly or by an increment.
 
@@ -719,7 +719,8 @@ class ProgIter(_TQDMCompat, _BackwardsCompat):
             return
 
         self._iter_idx += inc
-        self._slow_path_step_body(force=force)
+        if display:
+            self._slow_path_step_body(force=force)
 
     def _adjust_frequency(self):
         # Adjust frequency so the next print will not happen until
